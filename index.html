@@ -30,7 +30,7 @@
 
         .bg-loser {
             background-color: #fafafa;
-            border: 1px solid #eee;
+            border: 1px solid #BDBDBD;
         }
 
         .bg-win {
@@ -103,7 +103,8 @@
                                 </v-card-text>
 
                                 <v-card-actions>
-                                    <v-btn color="yellow accent-4" @click="prepare(totalRounds)" class="ml-2 mb-3 black--text">
+                                    <v-btn color="yellow accent-4" @click="prepare(totalRounds)"
+                                        class="ml-2 mb-3 black--text">
                                         Gerar Resultados
                                     </v-btn>
                                 </v-card-actions>
@@ -127,6 +128,22 @@
                                 class="mb-6">
                                 <v-col cols="4" class="pt-2 rounded"
                                     :class="game.team1.win ? 'bg-win bg-win-left' : 'bg-loser'">
+                                    <div v-if="game.team1.double"
+                                        class="text-center text-caption font-weight-medium text-uppercase red darken-1 white--text pa-1">
+                                        <v-icon color="white" x-small style="margin-top: -3px;">
+                                            fas fa-star
+                                        </v-icon>
+                                        <v-icon color="white" x-small class="mx-2" style="margin-top: -3px;">
+                                            fas fa-star
+                                        </v-icon>
+                                        Rodada Dupla
+                                        <v-icon color="white" x-small class="mx-2" style="margin-top: -3px;">
+                                            fas fa-star
+                                        </v-icon>
+                                        <v-icon color="white" x-small style="margin-top: -3px;">
+                                            fas fa-star
+                                        </v-icon>
+                                    </div>
                                     <v-list subheader style="background: none">
                                         <v-list-item>
                                             <v-list-item-content class="text-right">
@@ -158,7 +175,7 @@
                                                     </v-icon>
                                                 </div>
                                                 <div
-                                                    class="text-right font-weight-bold text-uppercase text-caption blue-grey--text text--darken-1">
+                                                    class="text-right font-weight-bold text-uppercase text-caption blue-grey--text text--darken-1 pb-2">
                                                     Pontos:
                                                     {{game.team1.points}}
                                                 </div>
@@ -186,6 +203,22 @@
                                 </v-col>
                                 <v-col cols="4" class="pt-2 rounded"
                                     :class="game.team2.win ? 'bg-win bg-win-right' : 'bg-loser'">
+                                    <div v-if="game.team1.double"
+                                        class="text-center text-caption font-weight-medium text-uppercase red darken-1 white--text pa-1">
+                                        <v-icon color="white" x-small style="margin-top: -3px;">
+                                            fas fa-star
+                                        </v-icon>
+                                        <v-icon color="white" x-small class="mx-2" style="margin-top: -3px;">
+                                            fas fa-star
+                                        </v-icon>
+                                        Rodada Dupla
+                                        <v-icon color="white" x-small class="mx-2" style="margin-top: -3px;">
+                                            fas fa-star
+                                        </v-icon>
+                                        <v-icon color="white" x-small style="margin-top: -3px;">
+                                            fas fa-star
+                                        </v-icon>
+                                    </div>
                                     <v-list subheader style="background: none">
                                         <v-list-item>
                                             <v-list-item-avatar size="128" rounded
@@ -296,6 +329,7 @@
                             home: 0,
                             win: false,
                             aTie: false,
+                            double: false,
                         };
                     });
 
@@ -341,14 +375,20 @@
             createResults({ list1, list2 }) {
                 const results = [];
 
+                const states = [];
+                const doubleRound = [];
+
                 for (let i = 0; i < list1.length; i++) {
                     const team1 = list1[i];
                     const team2 = list2[i];
 
+                    // Sanitize
                     team1.win = false;
                     team1.aTie = false;
+                    team1.double = false;
                     team2.win = false;
                     team2.aTie = false;
+                    team2.double = false;
 
                     // Gols
                     team1.goals = Math.floor(Math.random() * 5);
@@ -368,13 +408,34 @@
                         team2.points += 3;
                     }
 
-                    // Em casa
+                    // Em casa / Mando de jogo
+                    let team1home = {}
+                    let team2home = {}
                     if (team1.home > team2.home) {
                         team2.home++;
-                        results.push({ team1: team2, team2: team1 });
+                        team1home = team2
+                        team2home = team1
                     } else {
                         team1.home++;
-                        results.push({ team1, team2 });
+                        team1home = team1
+                        team2home = team2
+                    }
+
+                    // Rodada Dupla
+                    if (states.includes(team1home.state)) {
+                        doubleRound.push(team1home.state)
+                    } else {
+                        states.push(team1home.state)
+                    }
+
+                    results.push({ team1: team1home, team2: team2home });
+                }
+
+                // Rodada Dupla
+                if (doubleRound.length) {
+                    for (const { team1 } of results) {
+                        if (!doubleRound.includes(team1.state)) continue
+                        team1.double = true
                     }
                 }
 
