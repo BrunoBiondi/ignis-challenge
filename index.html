@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Material+Icons" rel="stylesheet" />
+    <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet" />
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <style>
+        body .theme--light.v-application {
+            background-color: #2a4067;
+        }
+
+        header {
+            background-image: url("./img/header.jpg");
+            background-repeat: no-repeat;
+            background-position: bottom center;
+            height: 800px;
+        }
+
+        .bg-loser {
+            background-color: #fafafa;
+            border: 1px solid #eee;
+        }
+
+        .bg-win {
+            background-repeat: no-repeat;
+            background-size: cover;
+            border: 1px solid #c0ca33;
+        }
+
+        .bg-win-left {
+            background-image: url("./img/win-left.jpg");
+            background-position: center right;
+        }
+
+        .bg-win-right {
+            background-image: url("./img/win-right.jpg");
+            background-position: center left;
+        }
+
+        .bg-title-round {
+            background-image: url("./img/title-round.jpg");
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            border: 1px solid #000;
+        }
+
+        .pulse-win {
+            border-width: 5px;
+            border-style: solid;
+            animation-name: pulse-win-color;
+            animation-duration: 0.8s;
+            animation-iteration-count: infinite;
+            animation-direction: alternate-reverse;
+            animation-timing-function: ease;
+        }
+
+        @keyframes pulse-win-color {
+            from {
+                border-color: #fff;
+            }
+
+            to {
+                border-color: #ffd600;
+            }
+        }
+    </style>
+    <title>Ignis Bolão - IGNIS: NATURAL GAS PLANNING PLATFORM</title>
+</head>
+
+<body>
+    <div id="app">
+        <v-app>
+            <header>
+                <v-container style="max-width: 1280px">
+                    <v-row class="pa-4">
+                        <v-col cols="6" style="margin-top: 25%">
+                            <v-card class="px-4 py-5">
+                                <v-card-title class="font-weight-bold">
+                                    Informe os Times Partcipantes
+                                </v-card-title>
+
+                                <v-card-subtitle class="mb-3 red--text">
+                                    Preencha o Nome do Time e Estado
+                                    separado pelo sinal de ponto e vírgula
+                                </v-card-subtitle>
+
+                                <v-card-text class="pb-0">
+                                    <v-textarea outlined label="Time; Estado" :value="text" class="text-uppercase">
+                                    </v-textarea>
+                                </v-card-text>
+
+                                <v-card-actions>
+                                    <v-btn color="light-green accent-4" @click="prepare(totalRounds)" class="ml-2 mb-3">
+                                        Gerar Resultados
+                                    </v-btn>
+                                </v-card-actions>
+                            </v-card>
+                        </v-col>
+                    </v-row>
+                </v-container>
+            </header>
+            <v-container style="max-width: 1280px">
+                <v-row class="pa-4">
+                    <v-col cols="12">
+                        <div v-for="(round, index) in rounds" :key="index" class="my-16 py-16 rounded white">
+                            <v-row justify="center" class="mt-6 mb-16">
+                                <v-col cols="6" class="rounded bg-title-round pt-16 pb-8">
+                                    <div class="text-h3 font-weight-medium text-center text-uppercase white--text">
+                                        {{`${index + 1}ª`}} Rodada
+                                    </div>
+                                </v-col>
+                            </v-row>
+                            <v-row v-for="(game, index) in round.results" :key="index" justify="center" no-gutters
+                                class="mb-6">
+                                <v-col cols="4" class="pt-2 rounded"
+                                    :class="game.team1.win ? 'bg-win bg-win-left' : 'bg-loser'">
+                                    <v-list subheader style="background: none">
+                                        <v-list-item>
+                                            <v-list-item-content class="text-right">
+                                                <div class="pb-3">
+                                                    <v-avatar color="primary" rounded size="20">
+                                                        <span class="white--text text-caption">
+                                                            {{game.team1.serie}}
+                                                        </span>
+                                                    </v-avatar>
+                                                </div>
+                                                <v-list-item-title class="text-right text-h6">
+                                                    <strong>{{game.team1.team}}</strong>
+                                                </v-list-item-title>
+                                                <v-list-item-subtitle class="text-right pb-2">
+                                                    {{game.team1.state}}
+                                                </v-list-item-subtitle>
+                                                <div v-if="game.team1.win"
+                                                    class="text-right orange--text text--darken-3 font-weight-medium text-uppercase">
+                                                    Vencedor
+                                                    <v-icon color="orange" small style="margin-top: -5px;">
+                                                        fas fa-trophy
+                                                    </v-icon>
+                                                </div>
+                                                <div v-if="game.team2.aTie"
+                                                    class="text-right blue--text lighten-3 font-weight-medium text-uppercase">
+                                                    Empate
+                                                    <v-icon color="blue" small>
+                                                        fas fa-balance-scale
+                                                    </v-icon>
+                                                </div>
+                                                <div
+                                                    class="text-right font-weight-bold text-uppercase text-caption blue-grey--text text--darken-1">
+                                                    Pontos:
+                                                    {{game.team1.points}}
+                                                </div>
+                                            </v-list-item-content>
+                                            <v-list-item-avatar size="128" rounded
+                                                :class="{'pulse-win': game.team1.win}">
+                                                <v-img :alt="`${game.team1.team} avatar`" :src="game.team1.photo">
+                                                </v-img>
+                                            </v-list-item-avatar>
+                                        </v-list-item>
+                                    </v-list>
+                                </v-col>
+                                <v-col cols="1" align-self="center">
+                                    <div class="text-h1 text-right">
+                                        {{game.team1.goals}}
+                                    </div>
+                                </v-col>
+                                <v-col cols="1" align-self="center">
+                                    <div class="text-h3 text-center">X</div>
+                                </v-col>
+                                <v-col cols="1" align-self="center">
+                                    <div class="text-h1 text-left">
+                                        {{game.team2.goals}}
+                                    </div>
+                                </v-col>
+                                <v-col cols="4" class="pt-2 rounded"
+                                    :class="game.team2.win ? 'bg-win bg-win-right' : 'bg-loser'">
+                                    <v-list subheader style="background: none">
+                                        <v-list-item>
+                                            <v-list-item-avatar size="128" rounded
+                                                :class="{'pulse-win': game.team2.win}">
+                                                <v-img :alt="`${game.team2.team} avatar`" :src="game.team2.photo">
+                                                </v-img>
+                                            </v-list-item-avatar>
+
+                                            <v-list-item-content>
+                                                <div class="pb-3">
+                                                    <v-avatar color="primary" rounded size="20">
+                                                        <span class="white--text text-caption">
+                                                            {{game.team2.serie}}
+                                                        </span>
+                                                    </v-avatar>
+                                                </div>
+                                                <v-list-item-title class="text-h6">
+                                                    <strong>
+                                                        {{game.team2.team}}
+                                                    </strong>
+                                                </v-list-item-title>
+                                                <v-list-item-subtitle class="pb-2">
+                                                    {{game.team2.state}}
+                                                </v-list-item-subtitle>
+                                                <div v-if="game.team2.win"
+                                                    class="orange--text text--darken-3 font-weight-medium text-uppercase">
+                                                    <v-icon color="orange" small>
+                                                        fas fa-trophy
+                                                    </v-icon>
+                                                    Vencedor
+                                                </div>
+                                                <div v-if="game.team2.aTie"
+                                                    class="blue--text lighten-3 font-weight-medium text-uppercase">
+                                                    <v-icon color="blue" small>
+                                                        fas fa-balance-scale
+                                                    </v-icon>
+                                                    Empate
+                                                </div>
+                                                <div
+                                                    class="font-weight-bold text-uppercase text-caption blue-grey--text text--darken-1">
+                                                    Pontos:
+                                                    {{game.team2.points}}
+                                                </div>
+                                            </v-list-item-content>
+                                        </v-list-item>
+                                    </v-list>
+                                </v-col>
+                            </v-row>
+                        </div>
+                    </v-col>
+                </v-row>
+            </v-container>
+        </v-app>
+    </div>
+</body>
+<script>
+    new Vue({
+        el: "#app",
+        vuetify: new Vuetify(),
+        data: () => ({
+            text:
+                "Vasco;Rio de Janeiro\n" +
+                "Flamengo;Rio de Janeiro\n" +
+                "Palmeiras;São Paulo\n" +
+                "Santos;São Paulo\n" +
+                "Cruzeiro;Minas Gerais\n" +
+                "Internacional;Rio Grande do Sul\n",
+
+            list: [],
+            rounds: [],
+
+            totalRounds: 2,
+        }),
+        methods: {
+            prepare(total) {
+                this.list = [];
+                this.rounds = [];
+
+                this.formatText();
+                if (!this.list.length) {
+                    // TODO: Alerta de erro
+                    return;
+                }
+
+                this.createFirstRound();
+                if (total === 1) return;
+
+                for (let i = 1; i < total; i++) {
+                    this.createNextRound();
+                }
+            },
+
+            formatText() {
+                const list = this.text
+                    .trim()
+                    .split(/\r?\n/)
+                    .map((v, i) => {
+                        const serie = String.fromCharCode(i + 65);
+                        const [team, state] = v.toUpperCase().split(";");
+                        const photo = `./img/teams/${team.toLowerCase()}-capa.jpg`;
+                        return {
+                            serie,
+                            state,
+                            team,
+                            photo,
+                            points: 0,
+                            goals: 0,
+                            home: 0,
+                            win: false,
+                            aTie: false,
+                        };
+                    });
+
+                if (!list.length) {
+                    console.log("ERROR: List", list);
+                    return;
+                }
+
+                this.list = list;
+            },
+
+            createFirstRound() {
+                const divide = Math.ceil(this.list.length / 2);
+                const list1 = JSON.parse(JSON.stringify(this.list));
+                const list2 = list1
+                    .splice(divide, Number.MAX_VALUE)
+                    .reverse();
+
+                const { results } = this.createResults({ list1, list2 });
+
+                this.rounds.push({ list1, list2, results });
+            },
+
+            createNextRound() {
+                const lastGame = this.rounds.slice(-1)[0];
+
+                const { list1, list2 } = this.createLists(lastGame);
+                const { results } = this.createResults({ list1, list2 });
+
+                this.rounds.push({ list1, list2, results });
+            },
+
+            createLists(round) {
+                const list1 = JSON.parse(JSON.stringify(round.list1));
+                const list2 = JSON.parse(JSON.stringify(round.list2));
+
+                list2.push(list1.pop());
+                list1.splice(1, 0, list2.shift());
+
+                return { list1, list2 };
+            },
+
+            createResults({ list1, list2 }) {
+                const results = [];
+
+                for (let i = 0; i < list1.length; i++) {
+                    const team1 = list1[i];
+                    const team2 = list2[i];
+
+                    team1.win = false;
+                    team1.aTie = false;
+                    team2.win = false;
+                    team2.aTie = false;
+
+                    // Gols
+                    team1.goals = Math.floor(Math.random() * 5);
+                    team2.goals = Math.floor(Math.random() * 5);
+
+                    // Pontos
+                    if (team1.goals === team2.goals) {
+                        team1.aTie = true;
+                        team1.points += 1;
+                        team2.aTie = true;
+                        team2.points += 1;
+                    } else if (team1.goals > team2.goals) {
+                        team1.win = true;
+                        team1.points += 3;
+                    } else {
+                        team2.win = true;
+                        team2.points += 3;
+                    }
+
+                    // Em casa
+                    if (team1.home > team2.home) {
+                        team2.home++;
+                        results.push({ team1: team2, team2: team1 });
+                    } else {
+                        team1.home++;
+                        results.push({ team1, team2 });
+                    }
+                }
+
+                return { results };
+            },
+        },
+    });
+</script>
+
+</html>
