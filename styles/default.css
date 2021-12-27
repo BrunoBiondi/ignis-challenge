@@ -1,0 +1,65 @@
+body .theme--light.v-application {
+    background-color: #2a4067;
+}
+
+header {
+    background-image: url("./../img/header.jpg");
+    background-repeat: no-repeat;
+    background-position: bottom center;
+    height: 800px;
+}
+
+.container {
+    max-width: 1140px;
+}
+
+.champion {
+    background: url("./../img/champion.jpg") center center no-repeat;
+    height: 800px;
+    display: flex;
+    align-items: center;
+}
+
+.bg-loser {
+    background-color: #fafafa;
+    border: 1px solid #bdbdbd;
+}
+.bg-win {
+    background-repeat: no-repeat;
+    background-size: cover;
+    border: 1px solid #c0ca33;
+}
+.bg-win-left {
+    background-image: url("./../img/win-left.jpg");
+    background-position: center right;
+}
+.bg-win-right {
+    background-image: url("./../img/win-right.jpg");
+    background-position: center left;
+}
+
+.bg-title-round {
+    background-image: url("./../img/title-round.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border: 1px solid #000;
+}
+
+.pulse-win {
+    border-width: 5px;
+    border-style: solid;
+    animation-name: pulse-win-color;
+    animation-duration: 0.8s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate-reverse;
+    animation-timing-function: ease;
+}
+@keyframes pulse-win-color {
+    from {
+        border-color: #fff;
+    }
+    to {
+        border-color: #ffd600;
+    }
+}
