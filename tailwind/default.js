@@ -1,6 +1,5 @@
 new Vue({
     el: "#app",
-    vuetify: new Vuetify(),
     data: () => ({
         champion: null,
 
@@ -14,6 +13,8 @@ new Vue({
 
         list: [],
         rounds: [],
+
+        error: null,
     }),
     methods: {
         prepare(total = 2) {
@@ -21,10 +22,11 @@ new Vue({
 
             // Lista formatada
             const list = this.getTextToList();
-            if (!list.length) {
-                // TODO: Alerta de erro
-                return;
-            }
+            console.log(this.error, list);
+            if (!list.length) return;
+
+            console.log("UAI");
+
             this.list = list;
 
             // Primeira Rodada
@@ -40,19 +42,31 @@ new Vue({
             this.champion = this.getChampion();
         },
         resetResults() {
+            this.champion = null;
             this.list = [];
             this.rounds = [];
-            this.champion = {};
+            this.error = null;
         },
 
         getTextToList() {
+            const teams = [];
+            const duplicates = [];
+
             const list = this.text
                 .trim()
-                .split(/\r?\n/)
+                .split(/\r?\n/g)
+                .filter((v) => v.trim().length)
                 .map((v, i) => {
                     const serie = String.fromCharCode(i + 65);
                     const [team, state] = v.toUpperCase().split(";");
-                    const photo = `./img/teams/${team.toLowerCase()}-capa.jpg`;
+                    const photo = `./../img/teams/${team.toLowerCase()}-capa.jpg`;
+
+                    if (teams.includes(team)) {
+                        duplicates.push(team);
+                    } else {
+                        teams.push(team);
+                    }
+
                     return {
                         serie,
                         state,
@@ -67,7 +81,15 @@ new Vue({
                     };
                 });
 
-            return list;
+            if (duplicates.length) {
+                this.error = `Times duplicados: ${duplicates.join(", ")}.`;
+            } else if (list.length < 4) {
+                this.error = "Informe 04 Times ou mais em pares.";
+            } else if (list.length % 2 !== 0) {
+                this.error = "Acrescente ou remova um Time.";
+            }
+
+            return this.error ? [] : list;
         },
 
         createFirstRound() {

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="apple-touch-icon" sizes="57x57" href="./../favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="./../favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="./../favicon/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="./../favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="./../favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="./../favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="./../favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="./../favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./../favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="./../favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./../favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="./../favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./../favicon/favicon-16x16.png">
+    <link rel="manifest" href="./../favicon/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+    <meta name="theme-color" content="#2a4067">
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+    <script src="./default.js" defer></script>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ignis: '#2a4067',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" rel="stylesheet">
+
+    <style>
+        .ignis-win-left {
+            background-image: url("./../img/win-left.jpg");
+            background-position: center right;
+        }
+
+        .ignis-win-right {
+            background-image: url("./../img/win-right.jpg");
+            background-position: center left;
+        }
+
+        .ignis-pulse-win {
+            border-width: 5px;
+            border-style: solid;
+            animation-name: ignis-pulse-win-color;
+            animation-duration: 0.8s;
+            animation-iteration-count: infinite;
+            animation-direction: alternate-reverse;
+            animation-timing-function: ease;
+        }
+
+        @keyframes ignis-pulse-win-color {
+            from {
+                border-color: #fff;
+            }
+
+            to {
+                border-color: #ffd600;
+            }
+        }
+
+        @media (min-width: 1023.98px) {
+            .ignis-header {
+                background-image: url('./../img/header.jpg');
+            }
+
+            .ignis-header>div {
+                height: 800px;
+                padding-top: 280px;
+            }
+        }
+    </style>
+
+    <title>IGNIS BOLÃO - IGNIS: NATURAL GAS PLANNING PLATFORM</title>
+</head>
+
+<body class="bg-ignis">
+    <div id="app">
+        <header class="bg-no-repeat bg-bottom ignis-header">
+            <div class="container max-w-screen-xl mx-auto lg:p-3">
+                <img src="./../img/ign-header-mobile.jpg" class="w-full lg:hidden">
+                <div class="bg-white lg:rounded py-8 px-6 w-full lg:w-1/2">
+                    <h1 class="text-4xl font-bold mb-2">
+                        Informe os Times Participantes
+                    </h1>
+                    <p class="text-sm text-red-500 mb-4">Preencha o Nome do Time e Estado separado pelo sinal de
+                        ponto&nbsp;e&nbsp;vírgula</p>
+                    <textarea rows="5" class="border-solid border-2 border-slate-400 rounded p-2 text-md w-full mb-4"
+                        v-model="text"></textarea>
+                    <div v-if="error" class="bg-red-700 rounded py-1 px-3 font-medium text-white mb-3">{{error}}</div>
+                    <button @click.prevent="prepare()"
+                        class="bg-amber-400 hover:bg-amber-500 rounded text-lg font-bold w-full uppercase py-2 px-5">Gerar
+                        Resultados</button>
+                </div>
+            </div>
+        </header>
+        <div v-for="(round, index) in rounds" :key="index" class="container max-w-screen-xl mx-auto lg:p-3">
+            <div class="bg-white lg:rounded py-20 lg:py-16 px-4 lg:px-10 mb-16">
+                <h3 class="bg-center bg-cover bg-no-repeat text-3xl lg:text-6xl font-medium text-center text-white uppercase w-full lg:w-1/2 lg:mx-auto pt-12 pb-8 lg:pt-20 lg:pb-12 mb-10 rounded"
+                    style="background-image: url('./../img/title-round.jpg');">
+                    {{`${index + 1}ª`}} Rodada
+                </h3>
+                <div v-for="(game, index) in round.results" :key="index"
+                    class="grid grid-cols-6 lg:grid-cols-8 mt-16 lg:mt-20 mb-10 lg:mb-12">
+                    <div class="col-span-6 lg:order-2 lg:col-span-2 my-auto">
+                        <div class="grid grid-cols-5 text-center flex items-center px-4">
+                            <div class="text-9xl col-span-2">{{game.team1.goals}}</div>
+                            <div class="text-6xl">x</div>
+                            <div class="text-9xl col-span-2">{{game.team2.goals}}</div>
+                        </div>
+                    </div>
+                    <div class="col-span-3 lg:order-1 text-center lg:text-right rounded-l lg:rounded py-3" :class="{
+                            'bg-cover bg-center border-solid border border-stone-300 ignis-win-left': game.team1.win,
+                            'bg-slate-100 border-solid border border-slate-300': !game.team1.win,
+                        }">
+                        <div v-if="game.team1.double"
+                            class="bg-gradient-to-r from-orange-500 to-red-600 text-center text-white p-2 uppercase text-sm font-medium tracking-widest">
+                            <i class="fas fa-star hidden lg:inline-block mx-1"></i><i
+                                class="fas fa-star hidden lg:inline-block mx-1"></i>
+                            Rodada Dupla
+                            <i class="fas fa-star hidden lg:inline-block mx-1"></i><i
+                                class="fas fa-star hidden lg:inline-block mx-1"></i>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-5 p-3 flex flex-row-reverse">
+                            <div class="col-span-2 lg:order-last pt-0 lg:pt-3">
+                                <div class="bg-slate-300 bg-center bg-cover h-32 w-32 rounded mx-auto shadow-inner"
+                                    :class="{'ignis-pulse-win': game.team1.win}"
+                                    :style="`background-image: url('${game.team1.photo}');`"></div>
+                            </div>
+                            <div class="col-span-3 lg:pr-3 pt-3 -mt-6 lg:m-0">
+                                <div
+                                    class="bg-blue-600 py-1 px-2 inline-flex text-sm font-medium text-white rounded uppercase shadow-inner">
+                                    {{game.team1.serie}}</div>
+                                <div class="pt-2 pb-1">
+                                    <div class="text-xl font-bold uppercase break-words">{{game.team1.team}}</div>
+                                    <div class="text-sm font-normal text-slate-500 uppercase">{{game.team1.state}}</div>
+                                </div>
+                                <div v-if="game.team1.win" class="font-bold text-orange-500 uppercase">
+                                    Vencedor
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                                <div v-if="game.team1.aTie" class="font-bold text-blue-500 uppercase">
+                                    Empate
+                                    <i class="fas fa-balance-scale"></i>
+                                </div>
+                                <div class="text-sm font-bold text-slate-600 uppercase">Pontos: {{game.team1.points}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-span-3 lg:order-3 text-center lg:text-left rounded-r lg:rounded py-3" :class="{
+                        'bg-cover bg-center border-solid border border-stone-300 ignis-win-right': game.team2.win,
+                        'bg-slate-100 border-solid border border-slate-300': !game.team2.win,
+                    }">
+                        <div v-if="game.team1.double"
+                            class="bg-gradient-to-r from-orange-500 to-red-600 text-center text-white p-2 uppercase text-sm font-medium tracking-widest">
+                            <i class="fas fa-star hidden lg:inline-block mx-1"></i><i
+                                class="fas fa-star hidden lg:inline-block mx-1"></i>
+                            Rodada Dupla
+                            <i class="fas fa-star hidden lg:inline-block mx-1"></i><i
+                                class="fas fa-star hidden lg:inline-block mx-1"></i>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-5 p-3 flex flex-row-reverse">
+                            <div class="col-span-2 pt-0 lg:pt-3">
+                                <div class="bg-slate-300 bg-center bg-cover h-32 w-32 rounded mx-auto shadow-inner"
+                                    :class="{'ignis-pulse-win': game.team2.win}"
+                                    :style="`background-image: url('${game.team2.photo}');`"></div>
+                            </div>
+                            <div class="col-span-3 lg:pr-3 pt-3 -mt-6 lg:m-0">
+                                <div
+                                    class="bg-blue-600 py-1 px-2 inline-flex text-sm font-medium text-white rounded uppercase shadow-inner">
+                                    {{game.team2.serie}}</div>
+                                <div class="pt-2 pb-1">
+                                    <div class="text-xl font-bold uppercase break-words">{{game.team2.team}}</div>
+                                    <div class="text-sm font-normal text-slate-500 uppercase">{{game.team2.state}}</div>
+                                </div>
+                                <div v-if="game.team2.win" class="font-bold text-orange-500 uppercase">
+                                    <i class="fas fa-trophy"></i>
+                                    Vencedor
+                                </div>
+                                <div v-if="game.team2.aTie" class="font-bold text-blue-500 uppercase">
+                                    <i class="fas fa-balance-scale"></i>
+                                    Empate
+                                </div>
+                                <div class="text-sm font-bold text-slate-600 uppercase">Pontos: {{game.team2.points}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="champion" class="container max-w-screen-xl mx-auto lg:p-3">
+            <div class="bg-white bg-center bg-top bg-cover lg:rounded py-20 lg:py-16 px-4 lg:px-10 flex items-end"
+                style="background-image: url('./../img/champion.jpg'); min-height: 800px;">
+
+                <div class="mx-auto mb-6 text-center">
+                    <div class="bg-center bg-cover h-64 w-64 mb-6 rounded ignis-pulse-win"
+                        :style="`background-image: url('${champion.photo}');`"></div>
+
+                    <div
+                        class="bg-blue-600 py-1 px-2 inline-flex text-sm font-medium text-white rounded uppercase shadow-inner">
+                        {{champion.serie}}</div>
+
+                    <div class="pt-2 pb-1 text-3xl font-bold uppercase">{{champion.team}}</div>
+
+                    <div class="text-lg font-bold text-white uppercase">Pontos: {{champion.points}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer class="container max-w-screen-xl mx-auto py-8 px-3">
+            <p class="text-sm text-slate-300 text-center">
+                Projeto executado para teste na Ignis. Repositório original:
+                <a href="https://github.com/ignis-dev-team/ignis-challenge"
+                    class="text-amber-300 hover:underline">https://github.com/ignis-dev-team/ignis-challenge</a>
+            </p>
+        </footer>
+    </div>
+</body>
+
+</html>
